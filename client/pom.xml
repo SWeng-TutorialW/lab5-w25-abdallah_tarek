@@ -18,18 +18,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-controls</artifactId>
-			<version>23.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-fxml</artifactId>
 			<version>23.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-archetype-fxml</artifactId>
-			<version>0.0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
@@ -42,28 +32,29 @@
 			<version>3.2.0</version>
 		</dependency>
 		<dependency>
-			<groupId>${groupId}</groupId>
+			<groupId>il.cshaifasweng.OCSFMediatorExample</groupId>
 			<artifactId>entities</artifactId>
-			<version>0.0.1-SNAPSHOT</version> <!-- Replace with the correct version -->
 		</dependency>
-
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>23.0.1</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
-				<configuration>
-					<release>23</release>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.openjfx</groupId>
 				<artifactId>javafx-archetype-fxml</artifactId>
 				<version>0.0.6</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.13.0</version>
 				<configuration>
-					<mainClass>il.cshaifasweng.OCSFMediatorExample.client.Main</mainClass>
+					<source>23</source>
+					<target>23</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -72,6 +63,7 @@
 				<version>0.0.8</version>
 				<configuration>
 					<mainClass>il.cshaifasweng.OCSFMediatorExample.client.Main</mainClass>
+
 				</configuration>
 			</plugin>
 			<plugin>
