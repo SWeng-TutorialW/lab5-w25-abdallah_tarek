@@ -24,7 +24,6 @@ public class PrimaryController {
 	public void initialize() {
 		resetGame();
 
-		// Listen for updates from the server
 		SimpleClient.getClient().registerGameStatusListener((update) -> {
 			Platform.runLater(() -> handleServerUpdate(update));
 		});
@@ -35,14 +34,12 @@ public class PrimaryController {
 		Button clickedButton = (Button) event.getSource();
 
 		if (!isPlayerTurn || !clickedButton.getText().isEmpty()) {
-			return; // Ignore invalid moves
+			return;
 		}
 
-		// Determine the grid position
 		int row = GridPane.getRowIndex(clickedButton);
 		int col = GridPane.getColumnIndex(clickedButton);
 
-		// Update the board and send the move to the server
 		board[row][col] = currentPlayer;
 		clickedButton.setText(currentPlayer);
 		isPlayerTurn = false;
