@@ -5,6 +5,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
 
@@ -24,9 +26,8 @@ public class PrimaryController {
 	public void initialize() {
 		resetGame();
 
-		SimpleClient.getClient().registerGameStatusListener((update) -> {
-			Platform.runLater(() -> handleServerUpdate(update));
-		});
+		// Register to EventBus to listen for server updates
+		EventBus.getDefault().register(this);
 	}
 
 	@FXML
@@ -65,7 +66,7 @@ public class PrimaryController {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
 				board[i][j] = "";
-				Button button = (Button) getNodeByRowColumnIndex(i, j);
+				Button button = getNodeByRowColumnIndex(i, j);
 				if (button != null) {
 					button.setText("");
 				}
@@ -75,27 +76,31 @@ public class PrimaryController {
 		isPlayerTurn = false;
 	}
 
-	private void handleServerUpdate(String update) {
-		if (update.startsWith("turn:")) {
-			currentPlayer = update.split(":")[1];
-			isPlayerTurn = true;
-			statusLabel.setText("Your turn as " + currentPlayer);
-		} else if (update.startsWith("move:")) {
-			String[] parts = update.split(":")[1].split(",");
-			int row = Integer.parseInt(parts[0]);
-			int col = Integer.parseInt(parts[1]);
-			String player = parts[2];
+	@Subscribe
+	public void handleGameUpdate(GameUpdateEvent event) {
+		String update = event.getMessage();
+		Platform.runLater(() -> {
+			if (update.startsWith("turn:")) {
+				currentPlayer = update.split(":")[1];
+				isPlayerTurn = true;
+				statusLabel.setText("Your turn as " + currentPlayer);
+			} else if (update.startsWith("move:")) {
+				String[] parts = update.split(":")[1].split(",");
+				int row = Integer.parseInt(parts[0]);
+				int col = Integer.parseInt(parts[1]);
+				String player = parts[2];
 
-			board[row][col] = player;
-			Button button = (Button) getNodeByRowColumnIndex(row, col);
-			if (button != null) {
-				button.setText(player);
+				board[row][col] = player;
+				Button button = getNodeByRowColumnIndex(row, col);
+				if (button != null) {
+					button.setText(player);
+				}
+			} else if (update.startsWith("win:")) {
+				statusLabel.setText(update.split(":")[1] + " wins!");
+			} else if (update.equals("draw")) {
+				statusLabel.setText("It's a draw!");
 			}
-		} else if (update.startsWith("win:")) {
-			statusLabel.setText(update.split(":")[1] + " wins!");
-		} else if (update.startsWith("draw")) {
-			statusLabel.setText("It's a draw!");
-		}
+		});
 	}
 
 	private Button getNodeByRowColumnIndex(int row, int col) {
@@ -105,5 +110,11 @@ public class PrimaryController {
 			}
 		}
 		return null;
+	}
+
+	@FXML
+	public void cleanup() {
+		// Unregister from EventBus
+		EventBus.getDefault().unregister(this);
 	}
 }

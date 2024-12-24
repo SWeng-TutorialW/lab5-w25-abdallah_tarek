@@ -8,19 +8,19 @@
    <center>
       <GridPane fx:id="gameGrid" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="button00" GridPane.rowIndex="0" GridPane.columnIndex="0" onAction="#handleMove" prefWidth="100" prefHeight="100" />
-            <Button fx:id="button01" GridPane.rowIndex="0" GridPane.columnIndex="1" onAction="#handleMove" prefWidth="100" prefHeight="100" />
-            <Button fx:id="button02" GridPane.rowIndex="0" GridPane.columnIndex="2" onAction="#handleMove" prefWidth="100" prefHeight="100" />
-            <Button fx:id="button10" GridPane.rowIndex="1" GridPane.columnIndex="0" onAction="#handleMove" prefWidth="100" prefHeight="100" />
-            <Button fx:id="button11" GridPane.rowIndex="1" GridPane.columnIndex="1" onAction="#handleMove" prefWidth="100" prefHeight="100" />
-            <Button fx:id="button12" GridPane.rowIndex="1" GridPane.columnIndex="2" onAction="#handleMove" prefWidth="100" prefHeight="100" />
-            <Button fx:id="button20" GridPane.rowIndex="2" GridPane.columnIndex="0" onAction="#handleMove" prefWidth="100" prefHeight="100" />
-            <Button fx:id="button21" GridPane.rowIndex="2" GridPane.columnIndex="1" onAction="#handleMove" prefWidth="100" prefHeight="100" />
-            <Button fx:id="button22" GridPane.rowIndex="2" GridPane.columnIndex="2" onAction="#handleMove" prefWidth="100" prefHeight="100" />
+            <Button fx:id="button00" onAction="#handleMove" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+            <Button fx:id="button01" onAction="#handleMove" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+            <Button fx:id="button02" onAction="#handleMove" GridPane.rowIndex="0" GridPane.columnIndex="2" />
+            <Button fx:id="button10" onAction="#handleMove" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+            <Button fx:id="button11" onAction="#handleMove" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            <Button fx:id="button12" onAction="#handleMove" GridPane.rowIndex="1" GridPane.columnIndex="2" />
+            <Button fx:id="button20" onAction="#handleMove" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+            <Button fx:id="button21" onAction="#handleMove" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+            <Button fx:id="button22" onAction="#handleMove" GridPane.rowIndex="2" GridPane.columnIndex="2" />
          </children>
       </GridPane>
    </center>
    <bottom>
-      <Button text="Restart Game" onAction="#handleRestart" BorderPane.alignment="CENTER" />
+      <Button text="Restart" onAction="#handleRestart" BorderPane.alignment="CENTER" />
    </bottom>
 </BorderPane>
