@@ -94,7 +94,7 @@ public abstract class AbstractClient implements Runnable
   /**
   * The server's host name.
   */
-  private String host;
+  public String host;
 
   /**
   * The port number.
