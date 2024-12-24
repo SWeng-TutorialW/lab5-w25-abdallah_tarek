@@ -1,120 +1,64 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.TextField;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import sun.misc.Signal;
 
 import java.io.IOException;
 
 public class PrimaryController {
 
-	@FXML
-	private Label statusLabel;
 
 	@FXML
-	private GridPane gameGrid;
-
-	private String currentPlayer; // "X" or "O"
-	private boolean isPlayerTurn;
-	private String[][] board = new String[3][3];
+	private Button playButton;
 
 	@FXML
-	public void initialize() {
-		resetGame();
+	private Label connectionStatusLabel;
 
-		// Register to EventBus to listen for server updates
+	@FXML
+	void initialize() {
 		EventBus.getDefault().register(this);
+		connectionStatusLabel.setText(""); // Clear the status label
+
 	}
 
+
 	@FXML
-	private void handleMove(javafx.event.ActionEvent event) {
-		Button clickedButton = (Button) event.getSource();
-
-		if (!isPlayerTurn || !clickedButton.getText().isEmpty()) {
-			return;
-		}
-
-		int row = GridPane.getRowIndex(clickedButton);
-		int col = GridPane.getColumnIndex(clickedButton);
-
-		board[row][col] = currentPlayer;
-		clickedButton.setText(currentPlayer);
-		isPlayerTurn = false;
+	void startGame(ActionEvent event) {
+		String ip = "172.20.10.3";
+		String portText = "3000";
 
 		try {
-			SimpleClient.getClient().sendToServer("move:" + row + "," + col);
+			int port = Integer.parseInt(portText);
+			SimpleClient.initializeClient(ip, port);  // Initialize the client with provided IP and port
+			SimpleClient.getClient().openConnection();
+			playButton.setText("Connecting...");
+			connectionStatusLabel.setText("Connecting to server...");
+			System.out.println(ip);
+			System.out.println(port);
+		}  catch (IOException e) {
+			connectionStatusLabel.setText("Failed to connect! Check IP and Port.");
+			e.printStackTrace();
+		}
+		try {
+			SimpleClient.getClient().sendToServer("add player");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	@FXML
-	private void handleRestart() {
-		try {
-			SimpleClient.getClient().sendToServer("restart");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		resetGame();
-	}
-
-	private void resetGame() {
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
-				board[i][j] = "";
-				Button button = getNodeByRowColumnIndex(i, j);
-				if (button != null) {
-					button.setText("");
-				}
-			}
-		}
-		statusLabel.setText("Waiting for players...");
-		isPlayerTurn = false;
 	}
 
 	@Subscribe
-	public void handleGameUpdate(GameUpdateEvent event) {
-		String update = event.getMessage();
+	public void onConnected(Signal event) {
 		Platform.runLater(() -> {
-			if (update.startsWith("turn:")) {
-				currentPlayer = update.split(":")[1];
-				isPlayerTurn = true;
-				statusLabel.setText("Your turn as " + currentPlayer);
-			} else if (update.startsWith("move:")) {
-				String[] parts = update.split(":")[1].split(",");
-				int row = Integer.parseInt(parts[0]);
-				int col = Integer.parseInt(parts[1]);
-				String player = parts[2];
-
-				board[row][col] = player;
-				Button button = getNodeByRowColumnIndex(row, col);
-				if (button != null) {
-					button.setText(player);
-				}
-			} else if (update.startsWith("win:")) {
-				statusLabel.setText(update.split(":")[1] + " wins!");
-			} else if (update.equals("draw")) {
-				statusLabel.setText("It's a draw!");
-			}
+			playButton.setText("Waiting for another player...");
+			connectionStatusLabel.setText("Connected!");
 		});
-	}
-
-	private Button getNodeByRowColumnIndex(int row, int col) {
-		for (javafx.scene.Node node : gameGrid.getChildren()) {
-			if (GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == col) {
-				return (Button) node;
-			}
-		}
-		return null;
-	}
-
-	@FXML
-	public void cleanup() {
-		// Unregister from EventBus
-		EventBus.getDefault().unregister(this);
 	}
 }

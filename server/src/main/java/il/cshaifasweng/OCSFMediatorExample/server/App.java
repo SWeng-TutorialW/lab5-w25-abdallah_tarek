@@ -6,6 +6,6 @@ public class App {
     public static void main(String[] args) throws IOException {
         SimpleServer server = new SimpleServer(3000);
         server.listen();
-        System.out.println("Tic-Tac-Toe Server started");
+        System.out.println("Tic-Tac-Toe server listening on port 3000");
     }
 }

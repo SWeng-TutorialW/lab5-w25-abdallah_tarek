@@ -1,112 +1,164 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
-
+import il.cshaifasweng.OCSFMediatorExample.entities.CurrentStatusB;
+import il.cshaifasweng.OCSFMediatorExample.entities.GameHasEnded;
+import il.cshaifasweng.OCSFMediatorExample.entities.update;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.ConnectionToClient;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class SimpleServer extends AbstractServer {
-	private static final ArrayList<ConnectionToClient> players = new ArrayList<>();
-	private String[] board = new String[9];
-	private int currentPlayerIndex = -1;
+	private ConnectionToClient playerX;
+	private ConnectionToClient playerO;
+	private char turn = 'X';
+	private boolean gameInProgress = false;
+	private char [][] board = new char[3][3];
+
+
 
 	public SimpleServer(int port) {
 		super(port);
 		resetBoard();
-	}
 
-	private void resetBoard() {
-		for (int i = 0; i < 9; i++) {
-			board[i] = "";
-		}
 	}
 
 	@Override
-	protected synchronized void handleMessageFromClient(Object msg, ConnectionToClient client) {
-		String message = msg.toString();
-
-		try {
-			if (message.equals("new player")) {
-				if (players.size() < 2) {
-					players.add(client);
-					client.sendToClient("Waiting for another player...");
-
-					if (players.size() == 2) {
-						Collections.shuffle(players);
-						players.get(0).sendToClient("You are X");
-						players.get(1).sendToClient("You are O");
-						currentPlayerIndex = 0;
-						players.get(currentPlayerIndex).sendToClient("Your turn");
+	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
+		if (msg instanceof update move && gameInProgress) {
+			processMove(move, client);
+		} else if (msg instanceof String) {
+			String msgString = msg.toString();
+			System.out.println(msgString);
+			if (msgString.startsWith("add player")){
+				try {
+					System.out.println(playerX);
+					System.out.println(playerO);
+					if (playerX == null) {
+						playerX = client;
+						client.sendToClient("client added and connected");
+					} else if (playerO == null) {
+						playerO = client;
+						client.sendToClient("client added and connected");
 					}
-				} else {
-					client.sendToClient("Game is full!");
-				}
-			} else if (message.startsWith("move:")) {
-				if (client == players.get(currentPlayerIndex)) {
-					String[] parts = message.split(":");
-					int position = Integer.parseInt(parts[1]);
-
-					if (position >= 0 && position < 9 && board[position].isEmpty()) {
-						board[position] = currentPlayerIndex == 0 ? "X" : "O";
-
-						if (checkWin()) {
-							client.sendToClient("win:X");
-							players.get(1 - currentPlayerIndex).sendToClient("win:O");
-							resetBoard();
-						} else if (isBoardFull()) {
-							players.forEach(p -> {
-								try {
-									p.sendToClient("draw");
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
-							});
-							resetBoard();
-						} else {
-							currentPlayerIndex = 1 - currentPlayerIndex;
-							players.get(currentPlayerIndex).sendToClient("turn:" + (currentPlayerIndex == 0 ? "X" : "O"));
-						}
-					} else {
-						client.sendToClient("Invalid move. Try again.");
+					if(playerX != null && playerO != null && !gameInProgress) {
+						startNewGame();
 					}
-				} else {
-					client.sendToClient("Not your turn.");
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
-		} catch (IOException e) {
+			else if(msgString.startsWith("remove player")){
+				System.out.println("remove player");
+				System.out.println(gameInProgress);
+				if (gameInProgress) {
+					try {
+						if (playerX == client) {
+							System.out.println("Player X ended the session");
+							playerO.sendToClient(new GameHasEnded("Player X ended the session"));
+						} else {
+							System.out.println("Player O ended the session");
+							playerX.sendToClient(new GameHasEnded("Player O ended the session"));
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				gameInProgress = false;
+				playerO = null;
+				playerX = null;
+			}
+		}
+	}
+
+	private void resetBoard() {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				board[i][j] = ' ';
+			}
+		}
+		turn = 'X';
+	}
+
+
+	private void startNewGame() {
+		gameInProgress = true;
+		resetBoard();
+		try {
+			playerO.sendToClient(new CurrentStatusB(board, turn, 'O'));
+			playerX.sendToClient(new CurrentStatusB(board, turn, 'X'));
+		} catch (Exception e){
 			e.printStackTrace();
 		}
 	}
 
-	private boolean checkWin() {
-		String[][] winPatterns = {
-				{board[0], board[1], board[2]},
-				{board[3], board[4], board[5]},
-				{board[6], board[7], board[8]},
-				{board[0], board[3], board[6]},
-				{board[1], board[4], board[7]},
-				{board[2], board[5], board[8]},
-				{board[0], board[4], board[8]},
-				{board[2], board[4], board[6]},
-		};
+	private void processMove(update move, ConnectionToClient client) {
+		int row = move.getRow();
+		int col = move.getCol();
 
-		for (String[] pattern : winPatterns) {
-			if (!pattern[0].isEmpty() && pattern[0].equals(pattern[1]) && pattern[1].equals(pattern[2])) {
+		char clientSymbol = (client == playerX) ? 'X' : (client == playerO) ? 'O' : ' ';
+		if (clientSymbol == turn && board[row][col] == ' ') {
+			board[row][col] = turn;
+			try {
+				changeTurn();
+				playerO.sendToClient(new CurrentStatusB(board, turn, 'O'));
+				playerX.sendToClient(new CurrentStatusB(board, turn, 'X'));
+				if (check_if_won())
+				{
+					if(turn=='X') {
+						playerO.sendToClient(new GameHasEnded("Player " + 'O' + " won the game!"));
+						playerX.sendToClient(new GameHasEnded("Player " + 'O' + " won the game!"));
+					}
+					else {
+						playerX.sendToClient(new GameHasEnded("Player " +'X' + " won the game!"));
+						playerO.sendToClient(new GameHasEnded("Player " +'X' + " won the game!"));
+					}
+					playerO = null;
+					playerX = null;
+					gameInProgress = false;
+				}
+				else if (check_for_draw()) {
+
+					playerO.sendToClient(new GameHasEnded("draw!"));
+					playerX.sendToClient(new GameHasEnded("draw!"));
+					playerO = null;
+					playerX = null;
+					gameInProgress = false;
+				}
+			} catch (IOException e){
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private boolean check_for_draw() {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				if (board[i][j] == ' ') {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+	private boolean check_if_won() {
+		for (int i = 0; i < 3; i++) {
+			if (board[i][0] != ' ' && board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
 				return true;
 			}
 		}
-
-		return false;
-	}
-
-	private boolean isBoardFull() {
-		for (String cell : board) {
-			if (cell.isEmpty()) {
-				return false;
+		for (int j = 0; j < 3; j++) {
+			if (board[0][j] != ' ' && board[0][j] == board[1][j] && board[1][j] == board[2][j]) {
+				return true;
 			}
 		}
-		return true;
+		return board[1][1] != ' ' && ((board[0][0] == board[1][1] && board[1][1] == board[2][2]) ||
+				(board[2][0] == board[1][1] && board[1][1] == board[0][2]));
+	}
+
+
+
+	private void changeTurn() {
+		turn = (turn == 'X') ? 'O' : 'X';
 	}
 }
