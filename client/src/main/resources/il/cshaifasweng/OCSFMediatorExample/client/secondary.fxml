@@ -10,14 +10,14 @@
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="504.0" prefWidth="498.0" style="-fx-background-color: #f0f8ff;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.SecondaryController">
     <children>
         <!-- Status Label -->
-        <Label fx:id="statusLbl" alignment="CENTER" layoutX="50.0" layoutY="40.0" prefWidth="400.0" style="-fx-background-color: #FFC5D3; -fx-border-color: #b0c4de; -fx-border-radius: 10; -fx-padding: 10; -fx-font-size: 18px; -fx-font-weight: bold;" text="Waiting For Players........" textAlignment="CENTER" />
+        <Label fx:id="statusLbl" alignment="CENTER" layoutX="59.0" layoutY="40.0" prefWidth="400.0" style="-fx-background-color: #FFC5D3; -fx-border-color: #b0c4de; -fx-border-radius: 10; -fx-padding: 10; -fx-font-size: 18px; -fx-font-weight: bold;" text="Waiting For Players..." textAlignment="CENTER" />
 
         <!-- Game Grid -->
         <GridPane alignment="CENTER" gridLinesVisible="false" layoutX="56.0" layoutY="102.0" prefHeight="375.0" prefWidth="406.0" style="-fx-background-color: #FFC5D3; -fx-border-color: #FFC5D3; -fx-background-color: 0000000; -fx-border-width: 4; -fx-border-radius: 20; -fx-padding: 5; -fx-border-insets: 5;">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="144.0" minWidth="10.0" prefWidth="134.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="221.0" minWidth="10.0" prefWidth="138.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="219.0" minWidth="10.0" prefWidth="104.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="158.5" minWidth="10.0" prefWidth="146.5" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="221.0" minWidth="10.0" prefWidth="148.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="219.0" minWidth="10.0" prefWidth="83.5" />
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="SOMETIMES" />
