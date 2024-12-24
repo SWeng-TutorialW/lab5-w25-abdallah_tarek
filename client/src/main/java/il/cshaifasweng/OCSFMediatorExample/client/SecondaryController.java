@@ -112,7 +112,7 @@ public class SecondaryController {
 
 
     @Subscribe
-    public void onBoardMessage(CurrentStatusB bm){
+    public void OnCurrentStatusB(CurrentStatusB bm){
         this.currentStatusB = bm;
         Platform.runLater(this::updateMoves);
     }

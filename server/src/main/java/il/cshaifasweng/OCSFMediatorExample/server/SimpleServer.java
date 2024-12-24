@@ -102,7 +102,7 @@ public class SimpleServer extends AbstractServer {
 				changeTurn();
 				playerO.sendToClient(new CurrentStatusB(board, turn, 'O'));
 				playerX.sendToClient(new CurrentStatusB(board, turn, 'X'));
-				if (check_if_won())
+				if (checkForWinner())
 				{
 					if(turn=='X') {
 						playerO.sendToClient(new GameHasEnded("Player " + 'O' + " won the game!"));
@@ -116,8 +116,7 @@ public class SimpleServer extends AbstractServer {
 					playerX = null;
 					gameInProgress = false;
 				}
-				else if (check_for_draw()) {
-
+				else if (checkDraw()) {
 					playerO.sendToClient(new GameHasEnded("draw!"));
 					playerX.sendToClient(new GameHasEnded("draw!"));
 					playerO = null;
@@ -130,7 +129,7 @@ public class SimpleServer extends AbstractServer {
 		}
 	}
 
-	private boolean check_for_draw() {
+	private boolean checkDraw() {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
 				if (board[i][j] == ' ') {
@@ -141,7 +140,7 @@ public class SimpleServer extends AbstractServer {
 
 		return true;
 	}
-	private boolean check_if_won() {
+	private boolean checkForWinner() {
 		for (int i = 0; i < 3; i++) {
 			if (board[i][0] != ' ' && board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
 				return true;
