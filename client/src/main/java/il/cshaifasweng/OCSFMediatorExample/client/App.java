@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -10,6 +11,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
 
 import java.io.IOException;
 
@@ -69,7 +71,7 @@ public class App extends Application {
     }
 
     @Subscribe
-    public void onGameUpdateEvent(GameUpdateEvent event) {
+    public void onGameUpdateEvent(il.cshaifasweng.OCSFMediatorExample.client.GameUpdateEvent event) {
         Platform.runLater(() -> {
             Alert alert = new Alert(AlertType.INFORMATION, "Game Update: " + event.getMessage());
             alert.show();

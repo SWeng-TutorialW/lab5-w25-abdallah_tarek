@@ -52,13 +52,13 @@ public class SimpleServer extends AbstractServer {
 						board[position] = currentPlayerIndex == 0 ? "X" : "O";
 
 						if (checkWin()) {
-							client.sendToClient("You win!");
-							players.get(1 - currentPlayerIndex).sendToClient("You lose!");
+							client.sendToClient("win:X");
+							players.get(1 - currentPlayerIndex).sendToClient("win:O");
 							resetBoard();
 						} else if (isBoardFull()) {
 							players.forEach(p -> {
 								try {
-									p.sendToClient("It's a draw!");
+									p.sendToClient("draw");
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -66,7 +66,7 @@ public class SimpleServer extends AbstractServer {
 							resetBoard();
 						} else {
 							currentPlayerIndex = 1 - currentPlayerIndex;
-							players.get(currentPlayerIndex).sendToClient("Your turn");
+							players.get(currentPlayerIndex).sendToClient("turn:" + (currentPlayerIndex == 0 ? "X" : "O"));
 						}
 					} else {
 						client.sendToClient("Invalid move. Try again.");
